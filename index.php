@@ -24,11 +24,9 @@
 	
 		<div class="row">
 			<div class="col-xs-12 col-md-4">
-				<h3>Partie clicker</h3>
-				
-				<p>
-					<button type="button" class="btn btn-primary btn-lg">Large button</button>
-				</p>
+				<!--<img class="fond" src="images/fond.png">-->
+				<p id="compteur_total" class="compteur">0 prières</p>
+				<p><button id="lanceur_clicker" type="button" class="btn btn-primary btn-lg">Large button</button></p>
 			</div>
 			
 			<div class="col-md-5">
@@ -44,14 +42,16 @@
 
 	<footer class="footer">
 		<div class="container">
-			<p class="text-muted">Team GOFRBO.</p>
+			<p class="text-muted">Team Ange&Demon.</p>
 		</div>
     </footer>
 	
     <!-- jQuery -->
-    <script src="js/jquery-1.11-2.min.js"></script>
+    <script src="js/jquery-1.11.2.min.js"></script>
     <!-- bootstrap -->
     <script src="js/bootstrap.min.js"></script>
+    <!-- ClickerEngine -->
+    <script src="js/plugin.js"></script>
   </body>
   
 </html>
