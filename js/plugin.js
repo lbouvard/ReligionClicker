@@ -1,79 +1,113 @@
 $(document).ready(function() {
 	
 	//Init des variable
-	var compteur = 0
+	var gbGainTotal = 0
+	//mise à jour du compteur
 	setInterval(function (){ maj_score() }, 100);
 
-	//classe robot
-	function RobotClicker(nomRobot, incrementRobot, prixRobot, compteur) { 
-	    
-	    this.nom = nomRobot; 
-	    this.increment = incrementRobot;
-	    this.prixAchat = prixRobot;
-		this.compteur = compteur;
-	    this.nbInstance = 0;
-	    this.coefPrixAchat = 1;
-	    this.coefPrixVente = 0.6;
-	    this.prixVente = (this.prixAchat * this.coefPrixVente); 
-	    this.ratio = this.nbInstance * this.increment;
+	//classe Niveau
+	function Niveau(pNom, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
+		
+	    this.nom = pNom; 
+	    this.gainParSeconde = pGainParSeconde;
+		this.nombreItem = pNbItem;
+	    this.prix = pPrix;
+		this.production = pProduction;
+	    this.coeffAchat = pCoeffAchat;
+	    this.coeffVente = pCoeffVente;	    
+		this.prixVente = (this.prix * this.coeffVente);
+		this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;
 
-	     
-	    this.AugmenterIncrement = function(type, valeur) 
-	    { 
+	    this.AjouterGainParSeconde = function(type, valeur) {
+			
 	        if( type == 'unitaire')
-	        	this.increment += valeur;
+	        	this.gainParSeconde = this.gainParSeconde + valeur;
 	        else if ( type == 'multiple' )
-	        	this.increment *= valeur;
+	        	this.gainParSeconde = this.gainParSeconde * valeur;
 	        else if ( type == 'pourcentage')
-	        	this.increment += (this.increment * valeur) / 100;
-	        else
-	        	;
+	        	this.gainParSeconde = this.gainParSeconde + ((this.gainParSeconde * valeur) / 100);
 
 	        MettreAJourRatio();
 	    } 
 
-	    this.AugmenterPrix = function(coeff) 
-	    { 
-	        this.prixAchat += this.prixAchat * coeff;
+	    this.AjusterPrix = function() {
+			
+	        this.prix = Math.round(this.prix + (this.prix * coeffAchat));
+			AjusterPrixVente();
+	    }
+		
+		this.AjusterPrixVente = function() {
+			this.prixVente = Math.round(this.prix - (this.prix * this.coeffVente));
+		}
+
+	    this.AjouterItem = function(quantite) {
+			
+			for (i = 1; i <= quantite; i++)
+			{
+				if( gbGainTotal >= this.prix ){
+					this.nombreItem += 1;
+					AjusterPrix();
+				}
+				else
+					break;
+			}
+	    }
+		
+		this.RetirerItem = function() {
+			
+			this.nombreItem -= 1;
+			gdGainTotal += this.prixVente;
+			AjusterPrixVente();
+		}
+		
+		this.RetirerToutItem = function() {
+			
+			var index = this.nombreItem;
+			
+			for (i = 0; i < index; i++)
+			{
+				RetirerItem();
+			}			
+		}
+
+	    this.MajGainTotalParSeconde = function() {
+			
+	    	this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;
 	    }
 
-	    this.AjouterRobot = function(nbAAjouter) 
-	    { 
-	        this.nbInstance += nbAAjouter;
-
+	    this.RecupererProductionEnCours = function() {
+			
+	    	this.production += this.gainTotalParSeconde;
+	    	return this.gainTotalParSeconde;
 	    }
 
-	    this.MettreAJourRatio = function()
-	    {
-	    	this.ratio = this.nbInstance * this.increment;
-	    }
-
-	    this.RecupererGain = function()
-	    {
-	    	this.compteur += this.ratio;
-
-	    	return this.ratio;
-	    }
-
-	    this.VendreRobot = function(nbAVendre)
-	    {
-	    	this.nbInstance -= nbAVendre;
-	    	MettreAJourRatio();
-
-	    	this.prixVente = (this.prixAchat * this.coefPrixVente); 
-	    	return this.prixVente;
-	    }
-
+		this.getPrix = function() {
+			return this.prix;
+		}
+		
+		this.getGainParSeconde = function() {
+			
+			return this.gainParSeconde;
+		}
+		
+		this.getNombreItem = function() {
+			
+			return this.nombreItem;
+		}
+		
+		this.getGainTotalParSeconde = function() {
+			
+			return this.gainTotalParSeconde;
+		}
 	} 
 
-
 	$('#lanceur_clicker').on( 'click', function(){
-		compteur++;
+		gbGainTotal++;
 	});
 
 	function maj_score()
 	{
-		$('#compteur_total').html(compteur + " prières");
+		$('#compteur_total').html(gbGainTotal + " prières");
 	}
 
 });
