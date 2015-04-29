@@ -25,8 +25,17 @@
 		<div class="row">
 			<div class="col-xs-12 col-md-4">
 				<!--<img class="fond" src="images/fond.png">-->
-				<p id="compteur_total" class="compteur">0 prières</p>
-				<p><button id="lanceur_clicker" type="button" class="btn btn-primary btn-lg">Large button</button></p>
+				<div class="compteur">
+					<p>
+						<span id="compteur_total">0</span>
+						<span id="singulier"> prière</span>
+					</p>
+					<p>
+						par secondes : 
+						<span id="compteur_par_seconde">0</span>
+					</p>
+				</div>
+				<p><button id="lanceur_clicker" type="button" class="btn btn-primary btn-lg">Cliquez-moi!</button></p>
 			</div>
 			
 			<div class="col-md-5">
@@ -34,7 +43,24 @@
 			</div>
 			
 			<div class="col-md-3">
-				<h3>Partie shop</h3>
+				<p>
+					<button id="Niveau1" type="button" class="btn btn-primary btn-lg">Adèpte</button>
+					<button id="Niveau1Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
+					<span id="Niveau1Items">0</span>
+					<span id="Niveau1PrixItem">0</span>
+				</p>
+				<p>
+					<button id="Niveau2" type="button" class="btn btn-primary btn-lg">Prêtre</button>
+					<button id="Niveau2Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
+					<span id="Niveau2Items">0</span>
+					<span id="Niveau2PrixItem">0</span>
+				</p>
+				<p>
+					<button id="Niveau3" type="button" class="btn btn-primary btn-lg">Evêque</button>
+					<button id="Niveau3Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
+					<span id="Niveau3Items">0</span>
+					<span id="Niveau3PrixItem">0</span>
+				</p>
 			</div>
 		</div>
 		
