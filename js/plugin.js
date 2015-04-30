@@ -11,6 +11,7 @@ $(document).ready(function() {
 	setInterval(function (){ maj_score() }, 1);
 	//parcours des producteurs
 	setInterval(function (){ maj_production() }, 100);
+	setInterval(function (){ maj_titre() }, 2000);
 	//mise en place des niveau
 	GenererNiveau();
 
@@ -226,6 +227,11 @@ $(document).ready(function() {
 
 		$('#compteur_total').html(Math.round(gbGainTotal));
 		$('#compteur_par_seconde').html(gbGainParSeconde);
+	}
+
+	function maj_titre() {
+
+		$(document).prop('title', Math.round(gbGainTotal) +  " prières - Religion Clicker");
 	}
 
 	function maj_production() {

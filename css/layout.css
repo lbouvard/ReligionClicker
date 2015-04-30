@@ -46,49 +46,107 @@ table {
 	border-spacing: 0;
 }
 
-html {
+@font-face {
+  font-family: 'religious';
+  src: url('../fonts/italian.ttf')  format('truetype');
+}
+
+html, body { 
+	height: 100%;
+	font-family: 'religious';
+}
+
+.container-fluid {
 	min-height: 100%;
+	overflow: hidden;
 }
 
-body > .container {
-	padding-top: 60px;
+.clicker {
+	background-image: url("../images/fond_cut.png");
+	background-size: 100%;
+	background-repeat: no-repeat;
+	border: 5px solid #00608e;
 }
 
-.footer {
+.btn-clicker {
   position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Set the fixed height of the footer here */
-  height: 60px;
+  width: 30%;
+  left: 34%;
+  top: 23%;
+  cursor: pointer;
+}
+
+.btn-clicker:hover {
+  width: 31%;
+}
+
+.btn-clicker:active {
+  width: 30%;
+}
+
+[class*="col-"] {
+
   background-color: #00608e;
-}
-
-.footer > .container {
-  padding-right: 15px;
-  padding-left: 15px;
-}
-
-.container .text-muted {
-  margin: 20px 0;
-  color: white;
+  padding: 8px;
+  margin-bottom: -1200px;
+  padding-bottom: 1200px;
+  text-align: center;
 }
 
 .compteur {
-	background-color: rgba(0,0,0,0.4);
-    opacity: 0.6;
+	background-color: rgba(230,230,230,0.8);
+    opacity: 1;
 	margin-top: 10px;
 	padding-top: 10px;
-	padding-bottom: 10px;
+	padding-bottom: 8px;
 	text-align: center;
 
-	font-family: 'Kavoon', Georgia,serif;
-	font-size: 28px;
-	text-shadow: 0px 0px 4px #000;
-	color: #fff;
+	font-size: 24px;
+	font-weight: bold;
+	text-shadow: 0px 1px 0px white;
+	color: black;
+	border-radius: 15px;
 }
 
-/*
-.fond {
-    max-width: 100%;
-    max-height: 100%;
-}*/
+.titre {
+  font-size: 36px;
+  color: white;
+  padding: 12px;
+}
+
+.item {
+  background-color: rgb(250,250,250);
+  border-radius: 4px;
+  text-align: left;
+}
+
+.icone {
+	display: inline-block;
+}
+
+.info {
+	display: inline-block;
+	vertical-align: top;
+  	padding: 10px;
+}
+
+.nom-item {
+	font-size: 24px;
+  	font-weight: bold;
+}
+
+.prix-item {
+  position: relative;
+  padding-left: 18px;
+}
+
+.prix-item::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: 0px;
+  top: 2px;
+  background: url(../images/priereIcone.png);
+  width: 16px;
+  height: 16px;
+}
