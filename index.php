@@ -40,44 +40,13 @@
 
 					<img id="lanceur_clicker" class="img-responsive btn-clicker" src="images/priere.png">
 		        </div>
-		        <div class="col-md-4">Param</div>
 
-		        <div class="col-md-4">
+		        <div class="col-md-5 parametre">
+		        	<div id="affichage"></div>
+		        </div>
+
+		        <div id="shop" class="col-md-3">
 		        	<p class="titre">Shop</p>
-
-		        	<div class="item" id="item0">
-		        		<div class="icone">
-			        		<img id="itemIcon0" src="images/adepte.png">
-			        	</div>
-
-			        	<div class="info">
-			        		<div class="nom-item">
-			        			<span>Adepte</span>
-			        		</div>
-			        		<div class="prix-item">
-			        			<span>50</span>
-			        		</div>
-			        	</div>
-		        	</div>
-
-					<p>
-						<button id="Niveau1" type="button" class="btn btn-primary btn-lg">Adèpte</button>
-						<button id="Niveau1Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
-						<span id="Niveau1Items">0</span>
-						<span id="Niveau1PrixItem">0</span>
-					</p>
-					<p>
-						<button id="Niveau2" type="button" class="btn btn-primary btn-lg">Prêtre</button>
-						<button id="Niveau2Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
-						<span id="Niveau2Items">0</span>
-						<span id="Niveau2PrixItem">0</span>
-					</p>
-					<p>
-						<button id="Niveau3" type="button" class="btn btn-primary btn-lg">Evêque</button>
-						<button id="Niveau3Del" type="button" class="btn btn-danger btn-sm">Vendre</button>
-						<span id="Niveau3Items">0</span>
-						<span id="Niveau3PrixItem">0</span>
-					</p>
 		        </div>
 			</div>
 	</div>

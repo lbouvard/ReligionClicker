@@ -6,17 +6,39 @@ $(document).ready(function() {
 	var gbTabProducteur = new Array();
 	var gbSingulier = true;
 	var QUANTUM = 10;
+	var Niveaux;
+
+	var $conteneurShop = $('#shop');
 
 	//mise à jour du compteur
 	setInterval(function (){ maj_score() }, 1);
 	//parcours des producteurs
 	setInterval(function (){ maj_production() }, 100);
 	setInterval(function (){ maj_titre() }, 2000);
+
 	//mise en place des niveau
-	GenererNiveau();
+    $.ajax({
+		type: "GET",
+		url: 'chargement.php',
+		cache: false,
+		success: function(data){
+			Niveaux = JSON.parse(data);
+			GenererNiveau();
+		}
+    });
 
 	//verification des achats possible
 
+	/************************************
+	**
+	**	TIMER
+	**
+	************************************/
+	//mise à jour du compteur
+	setInterval(function (){ maj_score() }, 1);
+	//parcours des producteurs
+	setInterval(function (){ maj_production() }, 100);
+	setInterval(function (){ maj_titre() }, 2000);
 
 	/*************************************
 	**
@@ -136,22 +158,13 @@ $(document).ready(function() {
 	} 
 
 	function GenererNiveau(){
+		var i = 0;
 
-		//pNom, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente
-		var obj = new Niveau("Adepte", 1, 0, 5, 0, 0.4, 0.6);
-		gbTabProducteur.push(obj);
-		$('#Niveau1Items').html(obj.getNombreItem());
-		$('#Niveau1PrixItem').html(obj.getPrix());
-
-		obj = new Niveau("Prêtre", 10, 0, 50, 0, 0.5, 0.7);
-		gbTabProducteur.push(obj);
-		$('#Niveau2Items').html(obj.getNombreItem());
-		$('#Niveau2PrixItem').html(obj.getPrix());
-
-		obj = new Niveau("Evêque", 100, 0, 200, 0, 0.5, 0.8);
-		gbTabProducteur.push(obj);
-		$('#Niveau3Items').html(obj.getNombreItem());
-		$('#Niveau3PrixItem').html(obj.getPrix());
+		for (i in Niveaux) {
+			var obj = new Niveau(Niveaux[i].nom, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
+			gbTabProducteur.push(obj);
+			$conteneurShop.append("<div class='item' id='item" + i + "'><div class='icone'><img src='images/" + Niveaux[i].icone + "'></div><div class='info'><div class='nom-item'><span>" + Niveaux[i].nom + "</span></div><div class='prix-item'><span id='prixItem'>" + Niveaux[i].prix + "</span></div></div><div class='nb-item'><span id='nbItem'>" + Niveaux[i].nbItem + "</span></div></div>");
+		}
 	}
 
 	//ajout de prière par clic
@@ -160,37 +173,16 @@ $(document).ready(function() {
 	});
 
 	//Achat d'un item
-	$('#Niveau1').on( 'click', function() {
-
-		//on récupère le niveau dans le tableau
-		var obj = gbTabProducteur[0];
+	$(document).on( 'click', "div[id^='item']", function(){
+		var index = $(this)[0].id.substr(4,1);
+		var obj = gbTabProducteur[index];
 		obj.AjouterItem(1);
-		$('#Niveau1Items').html(obj.getNombreItem());
-		$('#Niveau1PrixItem').html(obj.getPrix());
+
+		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
+		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
 
 	});
-
-	//Achat d'un item
-	$('#Niveau2').on( 'click', function() {
-
-		//on récupère le niveau dans le tableau
-		var obj = gbTabProducteur[1];
-		obj.AjouterItem(1);
-		$('#Niveau2Items').html(obj.getNombreItem());
-		$('#Niveau2PrixItem').html(obj.getPrix());
-
-	});
-
-	//Achat d'un item
-	$('#Niveau3').on( 'click', function() {
-
-		//on récupère le niveau dans le tableau
-		var obj = gbTabProducteur[2];
-		obj.AjouterItem(1);
-		$('#Niveau3Items').html(obj.getNombreItem());
-		$('#Niveau3PrixItem').html(obj.getPrix());
-
-	});
+	
 
 	$('#Niveau1Del').on( 'click', function() {
 
