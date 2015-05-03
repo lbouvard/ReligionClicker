@@ -42,7 +42,10 @@
 		        </div>
 
 		        <div class="col-md-5 parametre">
-		        	<div id="affichage"></div>
+		        	<button type="button" id="boutonsave" class="btn btn-primary">Sauvegarder</button>
+					<div id="affichage">
+						
+					</div>
 		        </div>
 
 		        <div id="shop" class="col-md-3">

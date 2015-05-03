@@ -46,9 +46,10 @@ $(document).ready(function() {
 	**
 	**************************************/
 	//classe Niveau
-	function Niveau(pNom, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
+	function Niveau(pNom, pIcone, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
 		
-	    this.nom = pNom; 
+	    this.nom = pNom;
+		this.icone = pIcone;
 	    this.gainParSeconde = pGainParSeconde;
 		this.nombreItem = pNbItem;
 	    this.prix = pPrix;
@@ -136,7 +137,14 @@ $(document).ready(function() {
 	    	this.production += temp;
 	    	return temp;
 	    }
+	
+		this.ExporterDonnees = function () {
+			
+			var chaineExport = '{"nom":"' + this.nom + '", "icone":"' + this.icone + '", "gain":"' + this.gainParSeconde + '", "nbItem":"' + this.nombreItem + '", "prix":"' + this.prix + '", "production":"' + this.production + '", "coeffAchat":"' + this.coeffAchat + '", "coeffVente":"' + this.coeffVente + '"}';
 
+			return chaineExport;
+		}
+		
 		this.getPrix = function() {
 			return this.prix;
 		}
@@ -161,7 +169,7 @@ $(document).ready(function() {
 		var i = 0;
 
 		for (i in Niveaux) {
-			var obj = new Niveau(Niveaux[i].nom, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
+			var obj = new Niveau(Niveaux[i].nom, Niveaux[i].icone, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
 			gbTabProducteur.push(obj);
 			$conteneurShop.append("<div class='item' id='item" + i + "'><div class='icone'><img src='images/" + Niveaux[i].icone + "'></div><div class='info'><div class='nom-item'><span>" + Niveaux[i].nom + "</span></div><div class='prix-item'><span id='prixItem'>" + Niveaux[i].prix + "</span></div></div><div class='nb-item'><span id='nbItem'>" + Niveaux[i].nbItem + "</span></div></div>");
 		}
@@ -208,6 +216,10 @@ $(document).ready(function() {
 		$('#Niveau3PrixItem').html(obj.getPrix());		
 	})
 
+	$('#boutonsave').on( 'click', function() {
+			sauvegarder();
+	});
+	
 	function maj_score() {
 
 		if( gbSingulier ){
@@ -235,5 +247,39 @@ $(document).ready(function() {
 			gbGainParSeconde += obj.getGainTotalParSeconde();
 		}
 	}
-
+	
+	function sauvegarder() {
+		
+		//transformation objet vers données json
+		var tabDonnees = '[';
+		
+		for(i=0; i < gbTabProducteur.length; i++){
+			var obj = gbTabProducteur[i];
+			tabDonnees = tabDonnees + obj.ExporterDonnees() + ',';
+		}		
+		
+		tabDonnees = tabDonnees.substr(0, tabDonnees.length - 1) + ']';
+		
+		//envoi des données en ajax
+		
+		//test
+		/*$.post(
+			"sauvegarde.php", 
+			{json: JSON.stringify(tabDonnees), type:"partie", user:"1"},
+			function(data){
+				;
+			},
+			"json"
+		);*/
+		
+		$.ajax({
+			type: "POST",
+			url: 'sauvegarde.php',
+			data: JSON.stringify(tabDonnees),
+			contentType: "application/json; charset=UTF-8", 
+			success: function(data){
+				;
+			}
+		});
+	}
 });
