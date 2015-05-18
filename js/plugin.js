@@ -45,9 +45,19 @@ $(document).ready(function() {
 	**	FONCTIONS
 	**
 	**************************************/
-	//classe Niveau
+	
+	/**************************************************************
+	*	Classe 		: Niveau
+	*	Auteur		: Bouvard Laurent
+	*	Date		: 05/05/2015
+	*	Description : Classe qui permet de gérer une ressource. 
+	*	Une ressource contient un prix d'achat et un prix de vente
+	*	qui évolue à chaque achat/vente. Ces prix sont calculé par 
+	*	des coefficients fixes.
+	****************************************************************/
 	function Niveau(pNom, pIcone, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
 		
+		//attributs
 	    this.nom = pNom;
 		this.icone = pIcone;
 	    this.gainParSeconde = pGainParSeconde;
@@ -56,11 +66,13 @@ $(document).ready(function() {
 		this.production = pProduction;
 	    this.coeffAchat = pCoeffAchat;
 	    this.coeffVente = pCoeffVente;	    
-		this.prixVente = (this.prix * this.coeffVente);
-		this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;
+		this.prixVente = (this.prix * this.coeffVente);						//prix de vente calculé
+		this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;	//gain total de prière par seconde
 
+		//tableau pour mémoriser les différents prix d'achat - à chaque achat, le prix d'un item augmente.
 		this.TablePrix = [pPrix];
 
+		//Methode - Permet d'ajouter des prières par seconde
 	    this.AjouterGainParSeconde = function(type, valeur) {
 			
 	        if( type == 'unitaire')
@@ -70,20 +82,25 @@ $(document).ready(function() {
 	        else if ( type == 'pourcentage')
 	        	this.gainParSeconde = this.gainParSeconde + ((this.gainParSeconde * valeur) / 100);
 
+			//mise à jour du gain
 	        this.MajGainTotalParSeconde();
 	    } 
 
+		//Methode - Permet d'ajuster le prix d'achat du niveau suite à l'achat ou la vente d'un item de la ressource
 	    this.AjusterPrix = function() {
 			
 	        this.prix = Math.round(this.prix + (this.prix * this.coeffAchat));
 			this.AjusterPrixVente();
+			//on sauvegarde le prix de vente dans un tableau
 			this.TablePrix.push(this.prix);
 	    }
 		
+		//Methode - Permet d'ajuster le prix de vente
 		this.AjusterPrixVente = function() {
 			this.prixVente = Math.round(this.prix - (this.prix * this.coeffVente));
 		}
 
+		//Methode - Permet d'acheter un ou n item de la ressource
 	    this.AjouterItem = function(quantite) {
 			
 			for (i = 1; i <= quantite; i++)
@@ -91,23 +108,29 @@ $(document).ready(function() {
 				if( gbGainTotal >= this.prix ){
 					gbGainTotal -= this.prix;
 					this.nombreItem += 1;
+					//à chaque ajout, on augmente le prix de vente
 					this.AjusterPrix();
 				}
 				else
 					break;
 			}
+			//on met à jour le gain total par seconde
 			this.MajGainTotalParSeconde();
 	    }
 		
+		//Methode - Permet de vendre un item de la ressource
 		this.RetirerItem = function() {
 			
 			//on peut vendre seulement si on a des items
 			if( this.nombreItem > 0 ){
 				this.nombreItem -= 1;
+				//à la vente, on récupère le nombre de prière reçu de la vente et on ajoute au gain total
 				gbGainTotal += this.prixVente;
 				this.AjusterPrixVente();
+				//on retire le prix d'achat 
 				this.TablePrix.pop();
 
+				//on récupère le prix d'achat précédent
 				if( this.TablePrix.length > 0)
 					this.prix = this.TablePrix[this.TablePrix.length - 1];
 
@@ -115,6 +138,7 @@ $(document).ready(function() {
 			}
 		}
 		
+		//Methode - Permet de vendre tous les items de la ressource
 		this.RetirerToutItem = function() {
 			
 			var index = this.nombreItem;
@@ -123,21 +147,24 @@ $(document).ready(function() {
 			{
 				this.RetirerItem();
 			}
-		
 		}
 
+		//Methode - Permet de connaitre le nombre de prière par seconde
 	    this.MajGainTotalParSeconde = function() {
 			
 	    	this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;
 	    }
 
+		//Methode - Appelé toutes les 100ms pour cumuler la production de prière de la ressource
 	    this.RecupererProductionEnCours = function() {
 			
+			//QUANTUM correspond au coefficient temps pour récupérer le gain correct à chaque appel (ici vaut 10 car appel toutes les 100ms).
 			var temp = this.gainTotalParSeconde / QUANTUM;
 	    	this.production += temp;
 	    	return temp;
 	    }
 	
+		//Mise en place des données dans un fichier JSON - Sauvegarde
 		this.ExporterDonnees = function () {
 			
 			var chaineExport = '{"nom":"' + this.nom + '", "icone":"' + this.icone + '", "gain":"' + this.gainParSeconde + '", "nbItem":"' + this.nombreItem + '", "prix":"' + this.prix + '", "production":"' + this.production + '", "coeffAchat":"' + this.coeffAchat + '", "coeffVente":"' + this.coeffVente + '"}';
@@ -145,20 +172,23 @@ $(document).ready(function() {
 			return chaineExport;
 		}
 		
+		/*****************************************************************************/
+		
+		//Propriété - Récupère le prix d'achat d'une ressource
 		this.getPrix = function() {
 			return this.prix;
 		}
-		
+		//Propriété
 		this.getGainParSeconde = function() {
 			
 			return this.gainParSeconde;
 		}
-		
+		//Propriété
 		this.getNombreItem = function() {
 			
 			return this.nombreItem;
 		}
-		
+		//Propriété
 		this.getGainTotalParSeconde = function() {
 			
 			return this.gainTotalParSeconde;
@@ -189,6 +219,11 @@ $(document).ready(function() {
 		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
 		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
 
+	});
+	
+	$(document).on( 'click', '#btn_deconnexion', function(){
+		$.post('deconnexion.php');
+		window.location = "index.php";
 	});
 	
 

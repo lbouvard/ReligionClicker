@@ -56,6 +56,21 @@ html, body {
 	font-family: 'religious';
 }
 
+.form-group {
+  text-align: left;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+.btn-lg, .btn-group-lg>.btn {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
 .container-fluid {
 	min-height: 100%;
 	overflow: hidden;
@@ -179,6 +194,34 @@ html, body {
 }
 
 .parametre {
-  background-color: #d0e8ff;
+  background-color: #898989;
   border-top: 8px solid #00608e;
+  /* contour : #5b5b5b */
+}
+
+#div_connexion {
+  padding-top: 50%;
+  width: 60%;
+  margin: auto;
+}
+
+#div_inscription {
+  padding-top: 50%;
+  width: 60%;
+  margin: auto;
+}
+
+#erreur {
+	color: blue;
+	margin-bottom: 20px;
+	display: block;
+}
+
+#message {
+	color: white;
+	display: block;
+	font-size: 18px;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	
 }

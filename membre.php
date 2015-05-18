@@ -1,26 +1,9 @@
 <?php
-
-	session_start();
-	
-	if (!isset($_SESSION['login'])) {
-		header ('Location: index.php');
-		exit();
-	}
-	
+	//code ici
 ?>
 
-<html>
+<span id="message">Connecté en tant que <?php echo htmlentities(trim($_SESSION['login'])); ?></span>
 
-	<head>
-
-		<title>Espace membre</title>
-
-	</head>
-
-	<body>
-	
-		Bienvenue <?php echo htmlentities(trim($_SESSION['login'])); ?> !<br />
-		<a href="deconnexion.php">Déconnexion</a>
-		
-	</body>
-</html>
+<button type="button" id="btn_parametre" class="btn btn-primary">Paramètres</button>
+<button type="button" id="btn_stats" class="btn btn-primary">Statistiques</button>
+<button type="button" id="btn_deconnexion" class="btn btn-primary">Déconnexion</button>
