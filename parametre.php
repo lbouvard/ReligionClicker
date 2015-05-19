@@ -6,7 +6,7 @@
 	$erreur = "";
 	$nomReligion = "";
 	$iconeReligion = "";
-	$freqMajAuto = 0;
+	$freqMajAuto = "";
 
 	if( isset($_GET['get']) ){
 		//récupération des paramètres
@@ -38,16 +38,52 @@
 		}
 	}
 
-	var_dump($_POST);
-	//si on a un icone à charger
-	/*if( !empty($_FILES) ){
-		$erreur = upload();
-	}*/
+	if( isset($_POST['nomrel']) ){
 	
-	/*if( $erreur == "" ){
-		header("Location:membre.php");
-	}*/
+		//si on a un icone à charger
+		if( $_FILES["icone"]["name"] != "" ){
+			$erreur = upload();
+		}
 
+		if( $_POST['nomrel'] == "" || $_POST['periodemaj'] == "")
+			$erreur = $erreur."Veuillez renseigner tous les champs. L'icône est optionnel.\r\n";
+		else{
+
+			//connexion à la base
+			$mysqli = new mysqli('localhost', 'UserWeb', 'Uz28*Cesi', 'rcdb');
+
+			if( $mysqli->connect_errno) {
+				$erreur = $erreur."Echec de la connexion : ".$mysqli->connect_error."\r\n";
+			}
+			else{
+				
+				//param nom de la relgion
+				$insert = " UPDATE parameters
+								SET ValeurParametre = '".$_POST['nomrel']."'
+							WHERE NomParametre = 'NomReligion'
+							AND IdtMembre = ".$_SESSION['idt'];
+
+				$mysqli->query($insert);
+
+
+				//param fréquence de sauvegarde automatique.
+				$insert = " UPDATE parameters
+								SET ValeurParametre = '".$_POST['periodemaj']."''
+							WHERE NomParametre = 'FreqMajAuto'
+							AND IdtMembre = ".$_SESSION['idt'];
+				
+				$mysqli->query($insert);
+
+				//on ferme la connexion
+				$mysqli->close();
+			}
+		}
+
+		
+		if( $erreur == "" ){
+			header("Location:membre.php");
+		}
+	}
 ?>
 
 <div id="div_parametre">

@@ -62,6 +62,10 @@ html, body {
   font-weight: bold;
 }
 
+.form-control {
+  font-size: 20px;
+}
+
 label {
   margin-bottom: 5px;
 }
@@ -106,7 +110,7 @@ input[type=file] {
 [class*="col-"] {
 
   background-color: #00608e;
-  padding: 8px;
+  padding-top: 8px;
   margin-bottom: -1200px;
   padding-bottom: 1200px;
   text-align: center;
@@ -200,6 +204,8 @@ input[type=file] {
 .parametre {
   background-color: #898989;
   border-top: 8px solid #00608e;
+  padding-left: 0px;
+  padding-right: 0px;
   /* contour : #5b5b5b */
 }
 
@@ -216,7 +222,7 @@ input[type=file] {
 }
 
 #div_parametre {
-  padding-top: 50%;
+  padding-top: 50px;
   width: 60%;
   margin: auto;
 }
@@ -234,4 +240,48 @@ input[type=file] {
 	margin-bottom: 10px;
 	margin-top: 10px;
 	
+}
+
+#menu_haut {
+  padding-top: 25px;
+  padding-bottom: 50px;
+  border-bottom: 16px solid #00608e;
+}
+
+#accomplissements{
+  padding: 10px;
+}
+
+.tab_presentation{
+  width: 100%;
+  font-size: 18px;
+  color: white;
+}
+
+.tab_titre{
+  padding-top: 25px;
+  padding-bottom: 25px;
+  padding-left: 5px;
+  font-size: 22px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.tab_libelle{
+  width: 60%;
+  text-align: left;
+  padding: 5px;
+}
+
+.tab_valeur{
+  text-align: left;
+  font-weight: bold;
+}
+
+.tab_icone{
+  text-align: left;
+}
+
+.tab_icone > img{
+  padding: 10px;
 }

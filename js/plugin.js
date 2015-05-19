@@ -9,10 +9,14 @@ $(document).ready(function() {
 	var gbGainParSeconde = 0;
 	var gbTabProducteur = new Array();
 	var gbSingulier = true;
-	var QUANTUM = 10;
 	var Niveaux;
 	var Params;
 	var $conteneurShop = $('#shop');
+	var tmSauvergarde;
+
+	//Constante
+	var QUANTUM = 10;
+	var UNITETEMPS = 60 * 1000;		//1 minute en ms
 
 	/*************************************
 	**
@@ -29,9 +33,9 @@ $(document).ready(function() {
 		}
     });
 	
-	if( connecte = "oui" ){
+	if( connecte == "oui" ){
 		chargerSauvegarde();
-		chargerParametre();
+		chargerParametre(false);
 	}
 
 	//verification des achats possibles
@@ -44,9 +48,206 @@ $(document).ready(function() {
 	************************************/
 	//mise à jour du compteur
 	setInterval(function (){ maj_score() }, 1);
-	//parcours des producteurs
+	//mise à jour des producteurs
 	setInterval(function (){ maj_production() }, 100);
+	//mise à jour du titre de la barre de l'explorateur internet
 	setInterval(function (){ maj_titre() }, 2000);
+	//sauvegarde auto (par défaut 2)
+	tmSauvegarde = setInterval(function (){ sauvegarde_auto() }, 2 * UNITETEMPS);
+
+
+	/*************************************
+	**
+	**	TRIGGERS
+	**
+	**************************************/
+	//ajout de prière par clic
+	$('#lanceur_clicker').on( 'click', function(){
+		gbGainTotal++;
+	});
+
+	//Achat d'un item
+	$(document).on( 'click', "div[id^='item']", function(){
+		var index = $(this)[0].id.substr(4,1);
+		var obj = gbTabProducteur[index];
+		obj.AjouterItem(1);
+
+		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
+		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
+	});
+	
+	//connexion
+	$(document).on( 'click', '#connexion', function(){
+		
+		$.ajax({
+			type: "POST",
+			url: 'connexion.php',
+			data: { login: $('#login').val(), pass: $('#pass').val() },
+			success: function(data){
+				$('#bloc_central').html(data);
+
+				if( data.indexOf('div_connexion', 0) == -1 ){
+					connecte = "oui";
+					chargerSauvegarde();
+					chargerParametre(true);
+				}
+			}
+		});	
+	});
+
+	//deconnexion
+	$(document).on( 'click', '#deconnexion', function(){
+		$.ajax({
+			type: "POST",
+			url: 'deconnexion.php',
+			success: function(data){
+				//$('#bloc_central').html(data);
+			}
+		});
+		document.location.href = 'index.php';
+	});
+
+	//formulaire inscription
+	$(document).on( 'click', '#form_inscription', function(){
+		$.ajax({
+			type: "POST",
+			url: 'inscription.php',
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+	});
+
+	//validation de l'inscription
+	$(document).on( 'click', '#inscription', function(){
+		//inscription + retour page 
+		$.ajax({
+			type: "POST",
+			url: 'inscription.php',
+			data: { login: $('#login').val(), mdp: $('#mdp').val(), confirme: $('#confirme').val() },
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+
+		//génération paramètres défaut
+		$.ajax({
+			type: "GET",
+			url: 'defaut.php',
+			cache: false,
+	    });
+	});	
+
+	//Annuler l'inscription ou les paramètres
+	$(document).on( 'click', '#annuler', function(){
+		$.ajax({
+			type: "GET",
+			url: 'connexion.php',
+			cache: false,
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+    	});
+	});
+
+	//formulaire paramètre
+	$(document).on( 'click', '#parametre', function(){
+		$.ajax({
+			type: "GET",
+			url: 'parametre.php',
+			data : 'get',
+			success: function(data){
+				$('#accomplissements').html(data);
+			}
+		});
+	});
+
+	//validation des parametres
+	$(document).on( 'click', '#val_parametre', function(){
+		
+		var data = new FormData($('#donnees_parametre')[0]);
+
+		$.ajax({
+			type: "POST",
+			url: 'parametre.php',
+			data: data,
+			processData: false,
+			contentType: false,
+			success: function(data){
+				$('#bloc_central').html(data);
+
+				//si le formulaire à été bien traité
+				if( data.indexOf('div_parametre', 0) == -1 ){
+					chargerParametre(false);
+				}
+			}
+		});
+	});		
+
+	//sauvegarde des données de l'utilisateur
+	$(document).on( 'click', '#sauvegarde', function() {
+		sauvegarder();
+	});
+
+	//ouvre les statistiques
+	$(document).on( 'click', '#stats', function(){
+
+		var totalpriere = 0;
+		var nbachat = 0;
+
+		//on parcours les données du joueur
+		for(i=0; i < gbTabProducteur.length; i++){
+			var obj = gbTabProducteur[i];
+			totalpriere += obj.getProduction();
+			nbachat += obj.getNombreItem();
+		}	
+
+		$.ajax({
+			type: "POST",
+			url: 'statistique.php',
+			data: { now: $('#compteur_total').text(), total: totalpriere, achat: nbachat, seconde: $('#compteur_par_seconde').text() },
+			success: function(data){
+				$('#accomplissements').html(data);
+			}
+		});
+	});
+
+	//ferme les statistiques
+	$(document).on( 'click', '#fermer_stats', function(){
+		$.ajax({
+			type: "GET",
+			url: 'connexion.php',
+			cache: false,
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+    	});
+	});
+	
+	$('#Niveau1Del').on( 'click', function() {
+
+		var obj = gbTabProducteur[0];
+		obj.RetirerItem();
+		$('#Niveau1Items').html(obj.getNombreItem());
+		$('#Niveau1PrixItem').html(obj.getPrix());		
+	})
+
+	$('#Niveau2Del').on( 'click', function() {
+		
+		var obj = gbTabProducteur[1];
+		obj.RetirerItem();
+		$('#Niveau2Items').html(obj.getNombreItem());
+		$('#Niveau2PrixItem').html(obj.getPrix());		
+	})
+
+	$('#Niveau3Del').on( 'click', function() {
+		
+		var obj = gbTabProducteur[2];
+		obj.RetirerItem();
+		$('#Niveau3Items').html(obj.getNombreItem());
+		$('#Niveau3PrixItem').html(obj.getPrix());		
+	})
+
 
 	/*************************************
 	**
@@ -54,15 +255,6 @@ $(document).ready(function() {
 	**
 	**************************************/
 	
-	/**************************************************************
-	*	Classe 		: Niveau
-	*	Auteur		: Bouvard Laurent
-	*	Date		: 05/05/2015
-	*	Description : Classe qui permet de gérer une ressource. 
-	*	Une ressource contient un prix d'achat et un prix de vente
-	*	qui évolue à chaque achat/vente. Ces prix sont calculé par 
-	*	des coefficients fixes.
-	****************************************************************/
 	function Niveau(pIdt, pNom, pIcone, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
 		
 		//attributs
@@ -202,6 +394,11 @@ $(document).ready(function() {
 			
 			return this.gainTotalParSeconde;
 		}
+		//Propriété
+		this.getProduction = function() {
+
+			return this.production;
+		}
 	} 
 
 	function GenererNiveau(){
@@ -214,7 +411,7 @@ $(document).ready(function() {
 		}
 	}
 	
-	function AppliquerParametre(){
+	function AppliquerParametre(premiere_visite){
 		var i = 0;
 		
 		for (i in Params) {
@@ -226,10 +423,14 @@ $(document).ready(function() {
 				//On change l'image à cliquer.
 				$('#lanceur_clicker').attr('src',"images/" + Params[i].ValeurParametre);
 			}
-			else if( Params[i].NomParametre == 'NombrePrieres'){
+			else if( Params[i].NomParametre == 'NombrePrieres' && premiere_visite ){
 				//On applique le nombre de prière cumulé
 				$('#compteur_total').text(parseInt(Params[i].ValeurParametre));
 				gbGainTotal = parseInt(Params[i].ValeurParametre);
+			}
+			else if( Params[i].NomParametre == 'FreqMajAuto'){
+				clearInterval(tmSauvegarde);
+				tmSauvegarde = setInterval(function (){ sauvegarde_auto() }, parseInt(Params[i].ValeurParametre) * UNITETEMPS);
 			}
 		}
 	}
@@ -262,6 +463,12 @@ $(document).ready(function() {
 		}
 	}
 	
+	function sauvegarde_auto() {
+		if( connecte == "oui" ){
+			sauvegarder();
+		}
+	}
+
 	//sauvegarder les scores
 	function sauvegarder() {
 		
@@ -312,175 +519,16 @@ $(document).ready(function() {
 	}
 	
 	//charger les paramètres de l'utilisateur
-	function chargerParametre(){
+	function chargerParametre(premiere_visite){
 		$.ajax({
 			type: "GET",
 			url: 'chargement_param.php',
 			cache: false,
 			success: function(data){
 				Params = JSON.parse(data);
-				AppliquerParametre();
+				AppliquerParametre(premiere_visite);
 			}
 		});		
 	}
-	
-	/*************************************
-	**
-	**	TRIGGERS
-	**
-	**************************************/
-	
-	//ajout de prière par clic
-	$('#lanceur_clicker').on( 'click', function(){
-		gbGainTotal++;
-	});
-
-	//Achat d'un item
-	$(document).on( 'click', "div[id^='item']", function(){
-		var index = $(this)[0].id.substr(4,1);
-		var obj = gbTabProducteur[index];
-		obj.AjouterItem(1);
-
-		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
-		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
-	});
-	
-	//connexion
-	$(document).on( 'click', '#connexion', function(){
-		
-		$.ajax({
-			type: "POST",
-			url: 'connexion.php',
-			data: { login: $('#login').val(), pass: $('#pass').val() },
-			success: function(data){
-				$('#bloc_central').html(data);
-
-				if( data.indexOf('div_connexion', 0) == -1 ){
-					chargerSauvegarde();
-					chargerParametre();
-				}
-			}
-		});	
-	});
-
-	//deconnexion
-	$(document).on( 'click', '#deconnexion', function(){
-		$.ajax({
-			type: "POST",
-			url: 'deconnexion.php',
-			success: function(data){
-				//$('#bloc_central').html(data);
-			}
-		});
-		document.location.href = 'index.php';
-	});
-
-	//formulaire inscription
-	$(document).on( 'click', '#form_inscription', function(){
-		$.ajax({
-			type: "POST",
-			url: 'inscription.php',
-			success: function(data){
-				$('#bloc_central').html(data);
-			}
-		});
-	});
-
-	//validation de l'inscription
-	$(document).on( 'click', '#inscription', function(){
-		//inscription + retour page 
-		$.ajax({
-			type: "POST",
-			url: 'inscription.php',
-			data: { login: $('#login').val(), mdp: $('#mdp').val(), confirme: $('#confirme').val() },
-			success: function(data){
-				$('#bloc_central').html(data);
-			}
-		});
-
-		//génération paramètres défaut
-		$.ajax({
-			type: "GET",
-			url: 'defaut.php',
-			cache: false,
-	    });
-	});	
-
-	//Annuler l'inscription
-	$(document).on( 'click', '#annuler', function(){
-		$.ajax({
-			type: "GET",
-			url: 'connexion.php',
-			cache: false,
-			success: function(data){
-				$('#bloc_central').html(data);
-			}
-    	});
-	});
-
-	//formulaire paramètre
-	$(document).on( 'click', '#parametre', function(){
-		$.ajax({
-			type: "GET",
-			url: 'parametre.php',
-			data : 'get',
-			success: function(data){
-				$('#bloc_central').html(data);
-			}
-		});
-	});
-
-	//validation des parametres
-	$(document).on( 'click', '#val_parametre', function(){
-		
-		var data = new FormData($('#donnees_parametre')[0]);
-
-		$.ajax({
-			type: "POST",
-			url: 'parametre.php',
-			data: data,
-			processData: false,
-			contentType: false,
-			success: function(data){
-				$('#bloc_central').html(data);
-			}
-		});
-		
-		
-	});		
-
-	//sauvegarde des données de l'utilisateur
-	$(document).on( 'click', '#sauvegarde', function() {
-		sauvegarder();
-	});
-	
-	//déconnexion
-	$(document).on( 'click', '#deconnexion', function() {
-		$.post( "index.php", { deconnexion: "deconnexion" } );
-	});
-	
-	$('#Niveau1Del').on( 'click', function() {
-
-		var obj = gbTabProducteur[0];
-		obj.RetirerItem();
-		$('#Niveau1Items').html(obj.getNombreItem());
-		$('#Niveau1PrixItem').html(obj.getPrix());		
-	})
-
-	$('#Niveau2Del').on( 'click', function() {
-		
-		var obj = gbTabProducteur[1];
-		obj.RetirerItem();
-		$('#Niveau2Items').html(obj.getNombreItem());
-		$('#Niveau2PrixItem').html(obj.getPrix());		
-	})
-
-	$('#Niveau3Del').on( 'click', function() {
-		
-		var obj = gbTabProducteur[2];
-		obj.RetirerItem();
-		$('#Niveau3Items').html(obj.getNombreItem());
-		$('#Niveau3PrixItem').html(obj.getPrix());		
-	})
 
 });
