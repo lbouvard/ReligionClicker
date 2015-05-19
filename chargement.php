@@ -1,8 +1,37 @@
 <?php
-// wamp\www\ReligionClicker\chargement.php
+session_start();
 
-/* Permet de charger la sauvegarde d'une partie*/
+$erreur = "";
 
+/* Permet de charger la sauvegarde d'une partie */
+$mysqli = new mysqli('localhost', 'UserWeb', 'Uz28*Cesi', 'rcdb');
+		
+if( $mysqli->connect_errno) {
+	$erreur = "Echec de la connexion : ".$mysqli->connect_error;
+}
+else{
+	// on récupère les paramètres
+	$requete = "SELECT sp.NomArticle nom, sp.IconeArticle icone, maj.GainSauvegarde gain, maj.NbItemSauvegarde nbItem, 
+						maj.PrixSauvegarde prix, maj.ProductionSauvegarde production, sp.CoeffAchatArticle coeffAchat, 
+						sp.CoeffVenteArticle coeffVente 
+				FROM saves AS maj
+				INNER JOIN shop sp ON maj.IdtShop = sp.IdtArticle
+				WHERE IdtMembre = ".$_SESSION['idt'];
+				
+	$resultat = $mysqli->query($requete);
+	while( $donnees = $resultat->fetch_assoc() ){
+	
+		if( !is_null($donnees) ){
+			$jeux[] = $donnees;
+		}
+	}	
+
+	$resultat->close();
+	$mysqli->close();
+
+	echo json_encode($jeux, JSON_UNESCAPED_UNICODE);
+}
+/*
 $donnees[] = [
 	"nom" => "Adepte",
 	"icone" => "adepte.png",
@@ -58,6 +87,6 @@ $donnees[] = [
 	"coeffVente" => 0.8,
 	];
 
-echo json_encode($donnees, JSON_UNESCAPED_UNICODE);
+*/
 
 ?>

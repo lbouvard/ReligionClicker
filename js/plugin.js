@@ -16,18 +16,19 @@ $(document).ready(function() {
 	setInterval(function (){ maj_production() }, 100);
 	setInterval(function (){ maj_titre() }, 2000);
 
-	//mise en place des niveau
+	//chargement de la fenêtre de connexion
     $.ajax({
 		type: "GET",
-		url: 'chargement.php',
+		url: 'connexion.php',
 		cache: false,
 		success: function(data){
-			Niveaux = JSON.parse(data);
-			GenererNiveau();
+			$('#bloc_central').html(data);
 		}
     });
 
+
 	//verification des achats possible
+
 
 	/************************************
 	**
@@ -221,11 +222,117 @@ $(document).ready(function() {
 
 	});
 	
-	$(document).on( 'click', '#btn_deconnexion', function(){
-		$.post('deconnexion.php');
-		window.location = "index.php";
+	//connexion
+	$(document).on( 'click', '#connexion', function(){
+		$.ajax({
+			type: "POST",
+			url: 'connexion.php',
+			data: { login: $('#login').val(), pass: $('#pass').val() },
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+
+		//mise en place des niveau depuis la sauvegarde
+	    $.ajax({
+			type: "GET",
+			url: 'chargement.php',
+			cache: false,
+			success: function(data){
+				Niveaux = JSON.parse(data);
+				GenererNiveau();
+			}
+	    });		
 	});
-	
+
+	//deconnexion
+	$(document).on( 'click', '#deconnexion', function(){
+		$.ajax({
+			type: "POST",
+			url: 'deconnexion.php',
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+	});
+
+	//formulaire inscription
+	$(document).on( 'click', '#form_inscription', function(){
+		$.ajax({
+			type: "POST",
+			url: 'inscription.php',
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+	});
+
+	//validation de l'inscription
+	$(document).on( 'click', '#inscription', function(){
+		//inscription + retour page 
+		$.ajax({
+			type: "POST",
+			url: 'inscription.php',
+			data: { login: $('#login').val(), mdp: $('#mdp').val(), confirme: $('#confirme').val() },
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+
+		//génération paramètres défaut
+		$.ajax({
+			type: "GET",
+			url: 'defaut.php',
+			cache: false,
+	    });
+	});	
+
+	//Annuler l'inscription
+	$(document).on( 'click', '#annuler', function(){
+		$.ajax({
+			type: "GET",
+			url: 'connexion.php',
+			cache: false,
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+    	});
+	});
+
+	//formulaire paramètre
+	$(document).on( 'click', '#parametre', function(){
+		$.ajax({
+			type: "POST",
+			url: 'parametre.php',
+			success: function(data){
+				$('#bloc_central').html(data);
+			}
+		});
+	});
+
+	//validation des parametres
+	$(document).on( 'click', '#val_parametre', function(){
+		
+		var data = new FormData($('#donnees_parametre')[0]);
+		//data.append('file', icone);
+
+		$.ajax({
+			type: "POST",
+			url: 'parametre.php',
+			//data: { nomrel: $('#nomrel').val(), icone: $('#icone').val() },
+			data: data,
+			processData: false,
+			contentType: false,
+			success: function(data){
+				$('#bloc_central').html(data);
+
+				//On change l'image
+				$('#lanceur_clicker').attr('src',"images/" + icone);
+			}
+		});
+		
+		
+	});		
 
 	$('#Niveau1Del').on( 'click', function() {
 
