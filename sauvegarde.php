@@ -1,24 +1,28 @@
 <?php
+session_start();
 
-/****************************************** 
-** Date 		: 03/05/2015
-** Auteur 		: 
-** Fichier 		: sauvegarde.php
-** Description 	: Permet de sauvegarder 
-** la partie en cours ou les paramètres.
-*****************************************/
-
-$type = "";
-$id_utilisateur = "";
+$id_utilisateur = $_SESSION['idt'];
 $donnees = "";
 
-/*$type = $_POST['type'];
-$id_utilisateur = $_POST['user'];*/
-//$donnees = json_decode($_POST['json'], true);
+//Récupère les données en json.
 $donnees = json_decode(json_decode(file_get_contents('php://input')), true);
 
-foreach ($donnees as $item){
-	//echo $item['nom'];
+//connexion base
+$mysqli = new mysqli('localhost', 'UserWeb', 'Uz28*Cesi', 'rcdb');
+
+if( $mysqli->connect_errno) {
+	$erreur = "Echec de la connexion : ".$mysqli->connect_error;
+}
+else{
+	foreach ($donnees as $item){
+		$insert = "UPDATE saves
+					SET 
+					WHERE IdtMembre = ".$id_utilisateur."
+					AND IdtShop = ".$item['idt'];
+					
+		
+		//echo $item['nom'];
+	}
 }
 
 ?>

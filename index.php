@@ -49,7 +49,11 @@
 		        </div>
 			</div>
 	</div>
-
+	
+	<script>
+		var connecte = <?php if( isset($_SESSION['login']) && ($_SESSION['login'] != "") ) echo "oui"; else echo "non"; ?>;
+	</script>
+	
     <!-- jQuery -->
     <script src="js/jquery-1.11.2.min.js"></script>
     <!-- bootstrap -->
@@ -59,10 +63,3 @@
   </body>
   
 </html>
-
-<?php
-// wamp\www\ReligionClicker\index.php
-
-/* Contrôle frontal */
-
-?>

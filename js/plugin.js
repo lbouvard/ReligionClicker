@@ -1,21 +1,23 @@
 $(document).ready(function() {
 	
-	//Init des variable
+	/*************************************
+	**
+	**	INITIALISATION VARIABLES
+	**
+	**************************************/
 	var gbGainTotal = 0;
 	var gbGainParSeconde = 0;
 	var gbTabProducteur = new Array();
 	var gbSingulier = true;
 	var QUANTUM = 10;
 	var Niveaux;
-
 	var $conteneurShop = $('#shop');
 
-	//mise à jour du compteur
-	setInterval(function (){ maj_score() }, 1);
-	//parcours des producteurs
-	setInterval(function (){ maj_production() }, 100);
-	setInterval(function (){ maj_titre() }, 2000);
-
+	/*************************************
+	**
+	**	INITIALISATION PAGE
+	**
+	**************************************/
 	//chargement de la fenêtre de connexion
     $.ajax({
 		type: "GET",
@@ -25,10 +27,13 @@ $(document).ready(function() {
 			$('#bloc_central').html(data);
 		}
     });
+	
+	if( connecte = "oui" ){
+		chargerSauvegarde();
+	}
 
-
-	//verification des achats possible
-
+	//verification des achats possibles
+	//a faire
 
 	/************************************
 	**
@@ -56,17 +61,18 @@ $(document).ready(function() {
 	*	qui évolue à chaque achat/vente. Ces prix sont calculé par 
 	*	des coefficients fixes.
 	****************************************************************/
-	function Niveau(pNom, pIcone, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
+	function Niveau(pIdt, pNom, pIcone, pGainParSeconde, pNbItem, pPrix, pProduction, pCoeffAchat, pCoeffVente){
 		
 		//attributs
+		this.idt = parseInt(pIdt);
 	    this.nom = pNom;
 		this.icone = pIcone;
-	    this.gainParSeconde = pGainParSeconde;
-		this.nombreItem = pNbItem;
-	    this.prix = pPrix;
-		this.production = pProduction;
-	    this.coeffAchat = pCoeffAchat;
-	    this.coeffVente = pCoeffVente;	    
+	    this.gainParSeconde = parseInt(pGainParSeconde);
+		this.nombreItem = parseInt(pNbItem);
+	    this.prix = parseInt(pPrix);
+		this.production = Number(pProduction);
+	    this.coeffAchat = parseFloat(pCoeffAchat);
+	    this.coeffVente = parseFloat(pCoeffVente);	    
 		this.prixVente = (this.prix * this.coeffVente);						//prix de vente calculé
 		this.gainTotalParSeconde = this.nombreItem * this.gainParSeconde;	//gain total de prière par seconde
 
@@ -168,7 +174,7 @@ $(document).ready(function() {
 		//Mise en place des données dans un fichier JSON - Sauvegarde
 		this.ExporterDonnees = function () {
 			
-			var chaineExport = '{"nom":"' + this.nom + '", "icone":"' + this.icone + '", "gain":"' + this.gainParSeconde + '", "nbItem":"' + this.nombreItem + '", "prix":"' + this.prix + '", "production":"' + this.production + '", "coeffAchat":"' + this.coeffAchat + '", "coeffVente":"' + this.coeffVente + '"}';
+			var chaineExport = '{"idt":"' + this.idt + '", "nom":"' + this.nom + '", "icone":"' + this.icone + '", "gain":"' + this.gainParSeconde + '", "nbItem":"' + this.nombreItem + '", "prix":"' + this.prix + '", "production":"' + Math.ceil(this.production) + '", "coeffAchat":"' + this.coeffAchat + '", "coeffVente":"' + this.coeffVente + '"}';
 
 			return chaineExport;
 		}
@@ -200,12 +206,85 @@ $(document).ready(function() {
 		var i = 0;
 
 		for (i in Niveaux) {
-			var obj = new Niveau(Niveaux[i].nom, Niveaux[i].icone, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
+			var obj = new Niveau(Niveaux[i].idt, Niveaux[i].nom, Niveaux[i].icone, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
 			gbTabProducteur.push(obj);
 			$conteneurShop.append("<div class='item' id='item" + i + "'><div class='icone'><img src='images/" + Niveaux[i].icone + "'></div><div class='info'><div class='nom-item'><span>" + Niveaux[i].nom + "</span></div><div class='prix-item'><span id='prixItem'>" + Niveaux[i].prix + "</span></div></div><div class='nb-item'><span id='nbItem'>" + Niveaux[i].nbItem + "</span></div></div>");
 		}
 	}
+	
+	function maj_score() {
 
+		if( gbSingulier ){
+			if( gbGainTotal > 1 ){
+				gbSingulier = false;
+				$('#singulier').html('prières');
+			}
+		}
+
+		$('#compteur_total').html(Math.round(gbGainTotal));
+		$('#compteur_par_seconde').html(gbGainParSeconde);
+	}
+
+	function maj_titre() {
+
+		$(document).prop('title', Math.round(gbGainTotal) +  " prières - Religion Clicker");
+	}
+
+	function maj_production() {
+
+		gbGainParSeconde = 0;
+		for(i=0; i < gbTabProducteur.length; i++){
+			var obj = gbTabProducteur[i];
+			gbGainTotal += obj.RecupererProductionEnCours();
+			gbGainParSeconde += obj.getGainTotalParSeconde();
+		}
+	}
+	
+	//sauvegarder le score
+	function sauvegarder() {
+		
+		//transformation objet vers données json
+		var tabDonnees = '[';
+		
+		for(i=0; i < gbTabProducteur.length; i++){
+			var obj = gbTabProducteur[i];
+			tabDonnees = tabDonnees + obj.ExporterDonnees() + ',';
+		}		
+		
+		tabDonnees = tabDonnees.substr(0, tabDonnees.length - 1) + ']';
+		
+		//envoi des données en ajax
+		$.ajax({
+			type: "POST",
+			url: 'sauvegarde.php',
+			data: JSON.stringify(tabDonnees),
+			contentType: "application/json; charset=UTF-8", 
+			success: function(data){
+				;
+			}
+		});
+	}
+		
+	//charger la sauvegarde des scores
+	function chargerSauvegarde(){
+		//mise en place des niveau depuis la sauvegarde
+		$.ajax({
+			type: "GET",
+			url: 'chargement.php',
+			cache: false,
+			success: function(data){
+				Niveaux = JSON.parse(data);
+				GenererNiveau();
+			}
+		});		
+	}
+	
+	/*************************************
+	**
+	**	TRIGGERS
+	**
+	**************************************/
+	
 	//ajout de prière par clic
 	$('#lanceur_clicker').on( 'click', function(){
 		gbGainTotal++;
@@ -219,30 +298,22 @@ $(document).ready(function() {
 
 		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
 		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
-
 	});
 	
 	//connexion
 	$(document).on( 'click', '#connexion', function(){
+		
 		$.ajax({
 			type: "POST",
 			url: 'connexion.php',
 			data: { login: $('#login').val(), pass: $('#pass').val() },
 			success: function(data){
 				$('#bloc_central').html(data);
-			}
-		});
 
-		//mise en place des niveau depuis la sauvegarde
-	    $.ajax({
-			type: "GET",
-			url: 'chargement.php',
-			cache: false,
-			success: function(data){
-				Niveaux = JSON.parse(data);
-				GenererNiveau();
+				if( data.indexOf('div_connexion', 0) == -1 )
+					chargerSauvegarde();
 			}
-	    });		
+		});	
 	});
 
 	//deconnexion
@@ -334,6 +405,16 @@ $(document).ready(function() {
 		
 	});		
 
+	//sauvegarde des données de l'utilisateur
+	$(document).on( 'click', '#sauvegarde', function() {
+		sauvegarder();
+	});
+	
+	//déconnexion
+	$(document).on( 'click', '#deconnexion', function() {
+		$.post( "index.php", { deconnexion: "deconnexion" } );
+	});
+	
 	$('#Niveau1Del').on( 'click', function() {
 
 		var obj = gbTabProducteur[0];
@@ -358,70 +439,4 @@ $(document).ready(function() {
 		$('#Niveau3PrixItem').html(obj.getPrix());		
 	})
 
-	$('#boutonsave').on( 'click', function() {
-			sauvegarder();
-	});
-	
-	function maj_score() {
-
-		if( gbSingulier ){
-			if( gbGainTotal > 1 ){
-				gbSingulier = false;
-				$('#singulier').html('prières');
-			}
-		}
-
-		$('#compteur_total').html(Math.round(gbGainTotal));
-		$('#compteur_par_seconde').html(gbGainParSeconde);
-	}
-
-	function maj_titre() {
-
-		$(document).prop('title', Math.round(gbGainTotal) +  " prières - Religion Clicker");
-	}
-
-	function maj_production() {
-
-		gbGainParSeconde = 0;
-		for(i=0; i < gbTabProducteur.length; i++){
-			var obj = gbTabProducteur[i];
-			gbGainTotal += obj.RecupererProductionEnCours();
-			gbGainParSeconde += obj.getGainTotalParSeconde();
-		}
-	}
-	
-	function sauvegarder() {
-		
-		//transformation objet vers données json
-		var tabDonnees = '[';
-		
-		for(i=0; i < gbTabProducteur.length; i++){
-			var obj = gbTabProducteur[i];
-			tabDonnees = tabDonnees + obj.ExporterDonnees() + ',';
-		}		
-		
-		tabDonnees = tabDonnees.substr(0, tabDonnees.length - 1) + ']';
-		
-		//envoi des données en ajax
-		
-		//test
-		/*$.post(
-			"sauvegarde.php", 
-			{json: JSON.stringify(tabDonnees), type:"partie", user:"1"},
-			function(data){
-				;
-			},
-			"json"
-		);*/
-		
-		$.ajax({
-			type: "POST",
-			url: 'sauvegarde.php',
-			data: JSON.stringify(tabDonnees),
-			contentType: "application/json; charset=UTF-8", 
-			success: function(data){
-				;
-			}
-		});
-	}
 });

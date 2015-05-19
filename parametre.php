@@ -26,7 +26,7 @@
 		</div>
 
 		<div class="form-group">
-			<label for="icone">Icone central</label>
+			<label for="icone">Icone (max. 250x250)</label>
 			<input type="text" class="form-control" id="iconedefaut" value="<?php if( isset($_SESSION['icone']) ) echo $_SESSION['icone']; ?>">
 		</div>
 
