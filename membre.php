@@ -8,7 +8,3 @@
 <button type="button" id="stats" class="btn btn-primary">Statistiques</button>
 <button type="button" id="sauvegarde" class="btn btn-primary">Sauvegarder</button>
 <button type="button" id="deconnexion" class="btn btn-primary">Déconnexion</button>
-
-<script>
-	var icone = "<?php if( isset($_SESSION['icone']) ) echo $_SESSION['icone']; else echo ''; ?>";
-</script>

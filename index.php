@@ -24,7 +24,7 @@
 			<div class="row">
 		        <div class="col-md-4 clicker">
 		        	<div class="compteur">
-		        		<span>Messiah Larry Religion</span>
+		        		<span id="nomReligion">Nom de la religion</span>
 		        	</div>
 
 					<div class="compteur">
@@ -51,7 +51,7 @@
 	</div>
 	
 	<script>
-		var connecte = <?php if( isset($_SESSION['login']) && ($_SESSION['login'] != "") ) echo "oui"; else echo "non"; ?>;
+		var connecte = "<?php if( isset($_SESSION['login']) && ($_SESSION['login'] != "") ) echo "oui"; else echo "non"; ?>";
 	</script>
 	
     <!-- jQuery -->

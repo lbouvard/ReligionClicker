@@ -16,13 +16,16 @@ if( $mysqli->connect_errno) {
 else{
 	foreach ($donnees as $item){
 		$insert = "UPDATE saves
-					SET 
+					SET GainSauvegarde = ".$item['gain'].",
+						NbItemSauvegarde = ".$item['nbItem'].",
+						PrixSauvegarde = ".$item['prix'].",
+						ProductionSauvegarde = ".$item['production']."
 					WHERE IdtMembre = ".$id_utilisateur."
 					AND IdtShop = ".$item['idt'];
-					
-		
-		//echo $item['nom'];
+		$mysqli->query($insert);			
 	}
+	
+	$mysqli->close();
 }
 
 ?>

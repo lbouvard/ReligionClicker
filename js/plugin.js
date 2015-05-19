@@ -11,6 +11,7 @@ $(document).ready(function() {
 	var gbSingulier = true;
 	var QUANTUM = 10;
 	var Niveaux;
+	var Params;
 	var $conteneurShop = $('#shop');
 
 	/*************************************
@@ -30,6 +31,7 @@ $(document).ready(function() {
 	
 	if( connecte = "oui" ){
 		chargerSauvegarde();
+		chargerParametre();
 	}
 
 	//verification des achats possibles
@@ -212,6 +214,26 @@ $(document).ready(function() {
 		}
 	}
 	
+	function AppliquerParametre(){
+		var i = 0;
+		
+		for (i in Params) {
+			if( Params[i].NomParametre == 'NomReligion'){
+				//On applique le nom de la religion.
+				$('#nomReligion').text(Params[i].ValeurParametre);
+			}
+			else if( Params[i].NomParametre == 'IconeReligion'){
+				//On change l'image à cliquer.
+				$('#lanceur_clicker').attr('src',"images/" + Params[i].ValeurParametre);
+			}
+			else if( Params[i].NomParametre == 'NombrePrieres'){
+				//On applique le nombre de prière cumulé
+				$('#compteur_total').text(parseInt(Params[i].ValeurParametre));
+				gbGainTotal = parseInt(Params[i].ValeurParametre);
+			}
+		}
+	}
+	
 	function maj_score() {
 
 		if( gbSingulier ){
@@ -240,7 +262,7 @@ $(document).ready(function() {
 		}
 	}
 	
-	//sauvegarder le score
+	//sauvegarder les scores
 	function sauvegarder() {
 		
 		//transformation objet vers données json
@@ -253,12 +275,22 @@ $(document).ready(function() {
 		
 		tabDonnees = tabDonnees.substr(0, tabDonnees.length - 1) + ']';
 		
-		//envoi des données en ajax
+		//envoi des données en ajax (scores)
 		$.ajax({
 			type: "POST",
 			url: 'sauvegarde.php',
 			data: JSON.stringify(tabDonnees),
 			contentType: "application/json; charset=UTF-8", 
+			success: function(data){
+				;
+			}
+		});
+		
+		//sauvegarde du nombre total de prières
+		$.ajax({
+			type: "POST",
+			url: 'sauvegarde_param.php',
+			data: 'total=' + $('#compteur_total').text(),
 			success: function(data){
 				;
 			}
@@ -275,6 +307,19 @@ $(document).ready(function() {
 			success: function(data){
 				Niveaux = JSON.parse(data);
 				GenererNiveau();
+			}
+		});		
+	}
+	
+	//charger les paramètres de l'utilisateur
+	function chargerParametre(){
+		$.ajax({
+			type: "GET",
+			url: 'chargement_param.php',
+			cache: false,
+			success: function(data){
+				Params = JSON.parse(data);
+				AppliquerParametre();
 			}
 		});		
 	}
@@ -310,8 +355,10 @@ $(document).ready(function() {
 			success: function(data){
 				$('#bloc_central').html(data);
 
-				if( data.indexOf('div_connexion', 0) == -1 )
+				if( data.indexOf('div_connexion', 0) == -1 ){
 					chargerSauvegarde();
+					chargerParametre();
+				}
 			}
 		});	
 	});
@@ -322,9 +369,10 @@ $(document).ready(function() {
 			type: "POST",
 			url: 'deconnexion.php',
 			success: function(data){
-				$('#bloc_central').html(data);
+				//$('#bloc_central').html(data);
 			}
 		});
+		document.location.href = 'index.php';
 	});
 
 	//formulaire inscription
@@ -373,8 +421,9 @@ $(document).ready(function() {
 	//formulaire paramètre
 	$(document).on( 'click', '#parametre', function(){
 		$.ajax({
-			type: "POST",
+			type: "GET",
 			url: 'parametre.php',
+			data : 'get',
 			success: function(data){
 				$('#bloc_central').html(data);
 			}
@@ -385,20 +434,15 @@ $(document).ready(function() {
 	$(document).on( 'click', '#val_parametre', function(){
 		
 		var data = new FormData($('#donnees_parametre')[0]);
-		//data.append('file', icone);
 
 		$.ajax({
 			type: "POST",
 			url: 'parametre.php',
-			//data: { nomrel: $('#nomrel').val(), icone: $('#icone').val() },
 			data: data,
 			processData: false,
 			contentType: false,
 			success: function(data){
 				$('#bloc_central').html(data);
-
-				//On change l'image
-				$('#lanceur_clicker').attr('src',"images/" + icone);
 			}
 		});
 		

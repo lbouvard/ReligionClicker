@@ -32,26 +32,8 @@
 
 				//compte en cours
 				$_SESSION['login'] = $_POST['login'];
-				$_SESSION['idt'] = $idtMembre;
-
-				//Récupération des paramètres.
-				$requete = "SELECT NomParametre, ValeurParametre
-							FROM parameters 
-							WHERE IdtMembre = '".$idtMembre."'";
-							
-				$resultat = $mysqli->query($requete);
-				
-				while( $donnees = $resultat->fetch_assoc() ){
-					
-					if( !is_null($donnees) ){
-						if( $donnees['NomParametre'] == "NomReligion" )
-							$_SESSION['nom_religion'] = $donnees['ValeurParametre'];
-						else
-							$_SESSION['icone'] = $donnees['ValeurParametre'];
-					}
-				}		
+				$_SESSION['idt'] = $idtMembre;		
 			}
-
 
 			$resultat->close();
 			$mysqli->close();

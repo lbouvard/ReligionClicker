@@ -29,12 +29,19 @@ function generer_niveau_defaut(){
 		}
 
 		$resultat->close();
+		
+		$insert = "INSERT INTO parameters
+						(IdtMembre, NomParametre, ValeurParametre, TypeParametre)
+				   VALUES
+						(".$_SESSION['idt'].", 'NomReligion', 'Religion', 'TEXT'),
+						(".$_SESSION['idt'].", 'IconeReligion', 'priere.png', 'ICONE'),
+						(".$_SESSION['idt'].", 'NombrePrieres', 0, 'NOMBRE'),
+						(".$_SESSION['idt'].", 'FreqMajAuto', 2, 'MINUTE')
+						";
+						
+		$mysqli->query($insert);
 		$mysqli->close();
 	}	
-}
-
-function generer_parametre_defaut(){
-
 }
 
 ?>
