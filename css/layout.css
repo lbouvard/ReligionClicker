@@ -285,3 +285,40 @@ input[type=file] {
 .tab_icone > img{
   padding: 10px;
 }
+
+.acc_bordure{
+  background-color: #5b5b5b;
+  width: 80%;
+  margin: auto;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.acc_centre{
+  background-color: white;
+  border-left: 5px solid #5b5b5b;
+  border-right:	5px solid #5b5b5b;
+  border-top: 3px solid #5b5b5b;
+  border-bottom: 3px solid #5b5b5b;
+  border-radius: 10px;
+  padding: 5px;
+  text-align: left;
+}
+
+.acc_titre{
+  padding: 2px;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.acc_desc{
+  padding: 2px;
+  font-size: 16px;
+}
+
+.acc_icone{
+  float: left;
+  position: relative;
+  left: -24px;
+  top: 5px;
+}

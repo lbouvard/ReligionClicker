@@ -96,7 +96,7 @@
 		</div>
 
 		<div class="form-group">
-			<label for="periodemaj">Fréquence maj. auto.(min)</label>
+			<label for="periodemaj">Sauvegarde auto(min)</label>
 			<input type="text" class="form-control" id="periodemaj" name="periodemaj" value="<?php echo $freqMajAuto; ?>">
 		</div>
 		

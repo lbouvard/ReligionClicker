@@ -8,9 +8,11 @@ $(document).ready(function() {
 	var gbGainTotal = 0;
 	var gbGainParSeconde = 0;
 	var gbTabProducteur = new Array();
+	var gbTabAccomplissement = new Array();
 	var gbSingulier = true;
 	var Niveaux;
 	var Params;
+	var Medailles;
 	var $conteneurShop = $('#shop');
 	var tmSauvergarde;
 
@@ -36,6 +38,7 @@ $(document).ready(function() {
 	if( connecte == "oui" ){
 		chargerSauvegarde();
 		chargerParametre(false);
+		chargerMedaille();
 	}
 
 	//verification des achats possibles
@@ -75,6 +78,10 @@ $(document).ready(function() {
 		$(this).find('#nbItem')[0].innerHTML = obj.getNombreItem();
 		$(this).find('#prixItem')[0].innerHTML = obj.getPrix();
 	});
+
+	/*$(document).on( 'mouseenter', "div[id^='item']", function(){
+		$(this).tooltip('show');
+	});*/
 	
 	//connexion
 	$(document).on( 'click', '#connexion', function(){
@@ -90,6 +97,9 @@ $(document).ready(function() {
 					connecte = "oui";
 					chargerSauvegarde();
 					chargerParametre(true);
+					chargerMedaille();
+					
+					$('[data-toggle="tooltip"]').tooltip();
 				}
 			}
 		});	
@@ -401,6 +411,32 @@ $(document).ready(function() {
 		}
 	} 
 
+	function Medaille(pIdt, pNom, pIcone, pDescription, pSeuil, pDisponible){
+		//attributs
+		this.idt = parseInt(pIdt);
+	    this.nom = pNom;
+		this.icone = pIcone;
+		this.description = pDescription;
+		this.disponible = pDisponible;
+	    this.seuil = parseInt(pSeuil);
+
+	    this.EstDisponible = function(){
+			return this.disponible;
+	    }
+
+		this.RecupererSeuil = function(){
+			return this.seuil;
+		}
+		
+		this.GagnerMedaille = function() {
+			this.disponible = 0;
+		}
+		
+		this.RecupererIdentite = function() {
+			return this.idt;
+		}
+	}
+	
 	function GenererNiveau(){
 		var i = 0;
 
@@ -408,6 +444,15 @@ $(document).ready(function() {
 			var obj = new Niveau(Niveaux[i].idt, Niveaux[i].nom, Niveaux[i].icone, Niveaux[i].gain, Niveaux[i].nbItem, Niveaux[i].prix, Niveaux[i].production, Niveaux[i].coeffAchat, Niveaux[i].coeffVente );
 			gbTabProducteur.push(obj);
 			$conteneurShop.append("<div class='item' id='item" + i + "'><div class='icone'><img src='images/" + Niveaux[i].icone + "'></div><div class='info'><div class='nom-item'><span>" + Niveaux[i].nom + "</span></div><div class='prix-item'><span id='prixItem'>" + Niveaux[i].prix + "</span></div></div><div class='nb-item'><span id='nbItem'>" + Niveaux[i].nbItem + "</span></div></div>");
+		}
+	}
+	
+	function GenererMedaille(){
+		var i = 0;
+
+		for (i in Medailles) {
+			var obj = new Medaille(Medailles[i].idt, Medailles[i].nom, Medailles[i].icone, Medailles[i].description, Medailles[i].seuil, Medailles[i].disponible );
+			gbTabAccomplissement.push(obj);
 		}
 	}
 	
@@ -446,6 +491,8 @@ $(document).ready(function() {
 
 		$('#compteur_total').html(Math.round(gbGainTotal));
 		$('#compteur_par_seconde').html(gbGainParSeconde);
+		
+		verifier_medaille();
 	}
 
 	function maj_titre() {
@@ -469,6 +516,20 @@ $(document).ready(function() {
 		}
 	}
 
+	function verifier_medaille(){
+		
+		for(i=0; i < gbTabAccomplissement.length; i++){
+			var obj = gbTabAccomplissement[i];
+			
+			if( obj.EstDisponible() == 1){
+				if( gbGainTotal >= obj.RecupererSeuil() ){
+					obj.GagnerMedaille();
+					sauvegarderMedailleJoueur(obj.RecupererIdentite());
+				}
+			}
+		}		
+	}
+	
 	//sauvegarder les scores
 	function sauvegarder() {
 		
@@ -531,4 +592,40 @@ $(document).ready(function() {
 		});		
 	}
 
+	//charger les accomplissements
+	function chargerMedaille(){
+		$.ajax({
+			type: "GET",
+			url: 'chargement_medaille.php',
+			cache: false,
+			success: function(data){
+				Medailles = JSON.parse(data);
+				GenererMedaille();
+			}
+		});		
+	}
+	
+	function afficherMedailleJoueur(){
+		$.ajax({
+			type: "GET",
+			url: 'accomplissement_ajax.php',
+			cache: false,
+			success: function(data){
+				$('#accomplissements').html(data);
+			}
+		});			
+	}
+	
+	function sauvegarderMedailleJoueur(idtMedaille){
+		$.ajax({
+			type: "POST",
+			url: 'sauvegarde_medaille.php',
+			cache: false,
+			data: { idt: idtMedaille },
+			success: function(data){
+				afficherMedailleJoueur();
+			}
+		});
+	}
+	
 });
